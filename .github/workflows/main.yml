@@ -1,0 +1,29 @@
+# Nome do arquivo: .gitlab-ci.yml
+
+# Definindo a imagem base para os jobs
+image: node:14
+
+# Definição dos stages que serão executados
+stages:
+  - test
+  - deploy
+
+# Definição dos jobs que serão executados
+# Job de teste
+test:
+  stage: test
+  script:
+    - npm install  # Instala as dependências do projeto
+    - npm test     # Executa os testes automatizados
+
+# Job de deploy
+deploy:
+  stage: deploy
+  script:
+    - apt-get update -qy
+    - apt-get install -y sshpass
+    - sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no user@server 'cd /path/to/deploy && git pull origin master && npm install && npm run build'
+  environment:
+    name: production
+  only:
+    - master  # Define que esse job só será executado quando um commit for feito no branch master
